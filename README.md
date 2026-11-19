@@ -21,6 +21,28 @@ dotnet publish src/VietKey -c Release -r win-x64 --self-contained false -p:Publi
 
 Có thể mở `VietKey.sln` bằng Visual Studio 2022 để build.
 
+## Bộ cài đặt
+
+Cần **Inno Setup 6.5+** (`winget install JRSoftware.InnoSetup`) và .NET 8 SDK, rồi chạy trong PowerShell:
+
+```powershell
+.\build-installer.ps1                       # x64, kèm sẵn .NET → chạy được ngay, không cần cài runtime
+.\build-installer.ps1 -FrameworkDependent   # file nhỏ hơn nhiều, máy đích cần .NET 8 Desktop Runtime
+.\build-installer.ps1 -Arch arm64           # Windows on ARM
+```
+
+Kết quả: `artifacts\VietKey-Setup-<phiên bản>-win-x64.exe`. Script chạy test, `dotnet publish` (single-file) rồi đóng gói bằng `installer\VietKey.iss`.
+
+Bộ cài:
+- giao diện cài đặt tiếng Việt / tiếng Anh (tự chọn theo ngôn ngữ Windows);
+- mặc định cài cho người dùng hiện tại, **không cần quyền admin** (có thể chọn cài cho mọi người);
+- tuỳ chọn *Khởi động cùng Windows* (bật sẵn) và *biểu tượng Desktop*; mục trong Start Menu;
+- tự đóng VietKey đang chạy trước khi cài đè / gỡ;
+- khi gỡ: xoá mục khởi động cùng Windows và hỏi có xoá cấu hình + bảng gõ tắt (`HKCU\Software\VietKey`, `%AppData%\VietKey`) không;
+- bản `-FrameworkDependent` kiểm tra .NET 8 Desktop Runtime và mở trang tải nếu thiếu.
+
+**GitHub Actions** (`.github/workflows/build-installer.yml`): đẩy tag `v0.3.0` → tự build bộ cài và đính kèm vào GitHub Release; hoặc chạy tay trong tab *Actions*.
+
 ## Sử dụng
 
 - **Bấm chuột trái** vào icon **V** (đỏ, tiếng Việt) hoặc **E** (xanh, tiếng Anh) để chuyển chế độ; hoặc dùng **Ctrl+Shift** (mặc định) / **Alt+Z**. Bấm đúp mở Bảng điều khiển.
@@ -94,6 +116,8 @@ src/VietKey/               ứng dụng WinForms
   App/ClipboardConverter.cs  chuyển mã clipboard và file
   App/AppSettings.cs       cấu hình trong Registry, khởi động cùng Windows
 tests/VietKey.Core.Tests/  xUnit
+installer/VietKey.iss      script Inno Setup (+ Vietnamese.isl)
+build-installer.ps1        build bộ cài một lệnh
 ```
 
 ## Giới hạn hiện tại

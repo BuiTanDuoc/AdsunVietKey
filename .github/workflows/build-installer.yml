@@ -1,0 +1,39 @@
+name: Build installer
+
+on:
+  push:
+    tags: ['v*']          # đẩy tag v0.3.0 → build và tạo GitHub Release
+  workflow_dispatch:       # hoặc chạy tay trong tab Actions
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cài Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build bộ cài
+        shell: pwsh
+        run: |
+          $version = if ('${{ github.ref_type }}' -eq 'tag') { '${{ github.ref_name }}'.TrimStart('v') } else { '' }
+          if ($version) { ./build-installer.ps1 -Version $version } else { ./build-installer.ps1 }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VietKey-Setup
+          path: artifacts/VietKey-Setup-*.exe
+
+      - name: Tạo GitHub Release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/VietKey-Setup-*.exe

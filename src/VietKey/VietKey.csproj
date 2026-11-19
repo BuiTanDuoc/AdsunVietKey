@@ -11,6 +11,7 @@
     <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
     <Version>0.3.0</Version>
     <Product>VietKey</Product>
+    <ApplicationIcon>VietKey.ico</ApplicationIcon>
     <Description>Bộ gõ tiếng Việt Telex/VNI viết bằng C# WinForms</Description>
   </PropertyGroup>
 
