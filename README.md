@@ -1,11 +1,15 @@
 # VietKey
 
-Bộ gõ tiếng Việt cho Windows viết bằng **C# / .NET 8 / WinForms**. Đây là bản viết lại từ đầu theo cách UniKey hoạt động (không dùng code của UniKey):
+Bộ gõ tiếng Việt cho Windows viết bằng **C# / .NET 8 / WinForms**, giao diện dùng **[SunnyUI](https://github.com/yhuse/SunnyUI)** (có chọn theme và màu). Đây là bản viết lại từ đầu theo cách UniKey hoạt động (không dùng code của UniKey):
 
 - hook bàn phím cấp thấp `WH_KEYBOARD_LL` cho toàn hệ thống;
 - engine Telex/VNI tự viết, tách riêng để test được;
 - thay chữ bằng `SendInput` (Backspace + ký tự Unicode `KEYEVENTF_UNICODE`);
 - icon ở khay hệ thống, lưu cấu hình vào `HKCU\Software\VietKey`.
+
+## Giấy phép
+
+SunnyUI phát hành theo **GPL-3.0**. Nếu phân phối VietKey kèm SunnyUI, VietKey cũng phải phát hành theo giấy phép tương thích GPL-3.0 (công bố mã nguồn). Dùng nội bộ thì không bị ràng buộc này.
 
 ## Build & chạy
 
@@ -24,7 +28,8 @@ Có thể mở `VietKey.sln` bằng Visual Studio 2022 để build.
 - **Bảng điều khiển** (Ctrl+Shift+F5): phần *Điều khiển* (bảng mã, kiểu gõ, phím chuyển) và nút *Mở rộng* để hiện:
   - *Tùy chọn khác*: gõ tự do, đặt dấu oà/uý, luôn dùng clipboard cho Unicode, kiểm tra chính tả, tự động khôi phục phím với từ sai, thông báo phản hồi, chuông khi chuyển ngôn ngữ;
   - *Tùy chọn gõ tắt*: bật gõ tắt, gõ tắt cả khi tắt tiếng Việt, Bảng gõ tắt...;
-  - *Hệ thống*: hiện hộp thoại khi khởi động, khởi động cùng Windows, giao diện tiếng Việt/Anh.
+  - *Hệ thống*: hiện hộp thoại khi khởi động, khởi động cùng Windows, giao diện tiếng Việt/Anh;
+  - *Giao diện*: chọn theme SunnyUI (Xanh dương, Xanh lá, Cam, Đỏ, Xám, Tím, Ngọc lục bảo, Đỏ san hô, Hổ phách, Xanh đậm, Đen, Tối) hoặc **Tự chọn màu** với bảng chọn màu. Theme áp ngay cho mọi cửa sổ và menu khay hệ thống.
   Mọi thay đổi có hiệu lực ngay; *Mặc định* đưa về cấu hình giống UniKey.
 
 | Tuỳ chọn | Ý nghĩa |
@@ -84,6 +89,7 @@ src/VietKey/               ứng dụng WinForms
   App/ControlPanelForm.cs  bảng điều khiển (thu nhỏ / mở rộng như UniKey)
   App/MacroEditorForm.cs   soạn bảng gõ tắt
   App/Lang.cs              giao diện tiếng Việt / tiếng Anh
+  App/UiKit.cs             theme SunnyUI, font, hộp thoại
   App/ConverterForm.cs     cửa sổ chuyển mã
   App/ClipboardConverter.cs  chuyển mã clipboard và file
   App/AppSettings.cs       cấu hình trong Registry, khởi động cùng Windows

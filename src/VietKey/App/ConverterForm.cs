@@ -1,9 +1,10 @@
+using Sunny.UI;
 using VietKey.Core.Conversion;
 
 namespace VietKey.App;
 
-/// <summary>Cửa sổ chuyển mã (tương tự UniKey Toolkit): clipboard, ô văn bản và file.</summary>
-internal sealed class ConverterForm : Form
+/// <summary>Công cụ chuyển mã (SunnyUI, tương tự UniKey Toolkit): clipboard, ô văn bản và file.</summary>
+internal sealed class ConverterForm : UIForm
 {
     private static readonly VietCharset[] SourceCharsets =
         { VietCharset.Unicode, VietCharset.UnicodeComposite, VietCharset.Tcvn3, VietCharset.VniWindows };
@@ -12,24 +13,29 @@ internal sealed class ConverterForm : Form
         { VietCharset.Unicode, VietCharset.UnicodeComposite, VietCharset.Tcvn3, VietCharset.VniWindows, VietCharset.NoAccent };
 
     private readonly AppSettings _settings;
-    private readonly ComboBox _cbFrom = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 170 };
-    private readonly ComboBox _cbTo = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 170 };
-    private readonly TextBox _txtSource = NewTextBox();
-    private readonly TextBox _txtResult = NewTextBox();
-    private readonly Label _status = new() { AutoSize = true, ForeColor = SystemColors.GrayText, Margin = new Padding(3, 8, 3, 3) };
+    private readonly float _k;
+    private readonly UIComboBox _cbFrom = new() { DropDownStyle = UIDropDownStyle.DropDownList };
+    private readonly UIComboBox _cbTo = new() { DropDownStyle = UIDropDownStyle.DropDownList };
+    private readonly UITextBox _txtSource = NewTextBox();
+    private readonly UITextBox _txtResult = NewTextBox();
+    private readonly UILabel _status = new() { AutoSize = true, BackColor = Color.Transparent };
 
     public event EventHandler? CharsetsChanged;
 
-    public ConverterForm(AppSettings settings)
+    public ConverterForm(AppSettings settings, Icon? icon)
     {
         _settings = settings;
+        _k = UiKit.Scale(this);
 
         Text = Lang.T("VietKey – Công cụ chuyển mã", "VietKey – Converter toolkit");
         StartPosition = FormStartPosition.CenterScreen;
-        Font = new Font("Segoe UI", 9f);
-        MinimumSize = new Size(620, 460);
-        Size = new Size(680, 520);
-        Padding = new Padding(10);
+        ShowTitleIcon = icon is not null;
+        if (icon is not null) Icon = icon;
+        MaximizeBox = true;
+        EscClose = true;
+        TitleHeight = S(36);
+        MinimumSize = new Size(S(700), S(500));
+        ClientSize = new Size(S(760), S(560));
 
         foreach (var c in SourceCharsets) _cbFrom.Items.Add(ControlPanelForm.CharsetName(c));
         foreach (var c in TargetCharsets) _cbTo.Items.Add(ControlPanelForm.CharsetName(c));
@@ -37,30 +43,29 @@ internal sealed class ConverterForm : Form
         _cbTo.SelectedIndex = Math.Max(0, Array.IndexOf(TargetCharsets, settings.ConvertTo));
         _cbFrom.SelectedIndexChanged += (_, _) => SaveCharsets();
         _cbTo.SelectedIndexChanged += (_, _) => SaveCharsets();
+        _cbFrom.Size = _cbTo.Size = new Size(S(200), S(29));
 
-        var swap = new Button { Text = Lang.T("⇄ Đảo", "⇄ Swap"), AutoSize = true };
+        var swap = MakeButton(Lang.T("Đảo", "Swap"), FontAwesomeIcons.fa_exchange, 100);
         swap.Click += (_, _) => Swap();
 
-        var charsetRow = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, WrapContents = false };
-        charsetRow.Controls.Add(new Label { Text = Lang.T("Nguồn:", "Source:"), AutoSize = true, Margin = new Padding(3, 7, 3, 3) });
+        var charsetRow = Row();
+        charsetRow.Controls.Add(Caption(Lang.T("Nguồn:", "Source:")));
         charsetRow.Controls.Add(_cbFrom);
         charsetRow.Controls.Add(swap);
-        charsetRow.Controls.Add(new Label { Text = Lang.T("Đích:", "Target:"), AutoSize = true, Margin = new Padding(9, 7, 3, 3) });
+        charsetRow.Controls.Add(Caption(Lang.T("Đích:", "Target:")));
         charsetRow.Controls.Add(_cbTo);
 
-        var btnClipboard = new Button { Text = Lang.T("Chuyển mã clipboard  (CS+F9)", "Convert clipboard  (CS+F9)"), AutoSize = true };
+        var btnClipboard = MakeButton(Lang.T("Chuyển mã clipboard [CS+F9]", "Convert clipboard [CS+F9]"), FontAwesomeIcons.fa_clipboard, 260);
         btnClipboard.Click += (_, _) => ConvertClipboard();
-        var btnText = new Button { Text = Lang.T("Chuyển ô văn bản ↓", "Convert text box ↓"), AutoSize = true };
+        var btnText = MakeButton(Lang.T("Chuyển ô văn bản", "Convert text box"), FontAwesomeIcons.fa_angle_double_down, 190);
         btnText.Click += (_, _) => ConvertText();
-        var btnFile = new Button { Text = Lang.T("Chuyển mã file...", "Convert file..."), AutoSize = true };
+        var btnFile = MakeButton(Lang.T("Chuyển mã file...", "Convert file..."), FontAwesomeIcons.fa_file_text_o, 180);
         btnFile.Click += (_, _) => ConvertFile();
-        var btnClose = new Button { Text = Lang.T("Đóng", "Close"), AutoSize = true, DialogResult = DialogResult.Cancel };
-        CancelButton = btnClose;
 
-        var actionRow = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill };
-        actionRow.Controls.AddRange(new Control[] { btnClipboard, btnText, btnFile, btnClose });
+        var actionRow = Row();
+        actionRow.Controls.AddRange(new Control[] { btnClipboard, btnText, btnFile });
 
-        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 7 };
+        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 7, Padding = new Padding(S(10)) };
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 50));
@@ -69,24 +74,47 @@ internal sealed class ConverterForm : Form
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         layout.Controls.Add(charsetRow);
-        layout.Controls.Add(new Label { Text = Lang.T("Văn bản nguồn (dán vào đây hoặc dùng clipboard):", "Source text (paste here or use the clipboard):"), AutoSize = true, Margin = new Padding(3, 8, 3, 2) });
+        layout.Controls.Add(Caption(Lang.T("Văn bản nguồn (dán vào đây hoặc dùng clipboard):", "Source text (paste here or use the clipboard):")));
         layout.Controls.Add(_txtSource);
-        layout.Controls.Add(new Label { Text = Lang.T("Kết quả:", "Result:"), AutoSize = true, Margin = new Padding(3, 8, 3, 2) });
+        layout.Controls.Add(Caption(Lang.T("Kết quả:", "Result:")));
         layout.Controls.Add(_txtResult);
         layout.Controls.Add(actionRow);
         layout.Controls.Add(_status);
         Controls.Add(layout);
+
+        UiKit.ApplyFont(this);
+        TitleFont = UiKit.NewFont(11f);
     }
 
     private VietCharset From => SourceCharsets[Math.Max(0, _cbFrom.SelectedIndex)];
     private VietCharset To => TargetCharsets[Math.Max(0, _cbTo.SelectedIndex)];
 
-    private static TextBox NewTextBox() => new()
+    private int S(int logical) => (int)Math.Round(logical * _k);
+
+    private static UITextBox NewTextBox() => new()
     {
         Multiline = true,
-        ScrollBars = ScrollBars.Vertical,
+        ShowScrollBar = true,
         Dock = DockStyle.Fill,
-        Font = new Font("Segoe UI", 10f),
+    };
+
+    private FlowLayoutPanel Row() => new() { AutoSize = true, Dock = DockStyle.Fill, WrapContents = false, Margin = new Padding(0, S(4), 0, S(4)) };
+
+    private UILabel Caption(string text) => new()
+    {
+        Text = text,
+        AutoSize = true,
+        BackColor = Color.Transparent,
+        Margin = new Padding(S(3), S(8), S(3), S(3)),
+    };
+
+    private UISymbolButton MakeButton(string text, int symbol, int width) => new()
+    {
+        Text = text,
+        Symbol = symbol,
+        SymbolSize = S(18),
+        Size = new Size(S(width), S(36)),
+        Margin = new Padding(S(3), S(3), S(9), S(3)),
     };
 
     private void SaveCharsets()
@@ -115,9 +143,15 @@ internal sealed class ConverterForm : Form
         try
         {
             int? length = ClipboardConverter.ConvertClipboard(From, To);
-            SetStatus(length is null
-                ? Lang.T("Clipboard không có văn bản.", "Clipboard has no text.")
-                : Lang.T($"Đã chuyển clipboard: {ControlPanelForm.CharsetName(From)} → {ControlPanelForm.CharsetName(To)} ({length} ký tự). Hãy dán (Ctrl+V).", $"Clipboard converted: {ControlPanelForm.CharsetName(From)} → {ControlPanelForm.CharsetName(To)} ({length} chars). Paste with Ctrl+V."));
+            if (length is null)
+            {
+                SetStatus(Lang.T("Clipboard không có văn bản.", "Clipboard has no text."));
+                return;
+            }
+            string from = ControlPanelForm.CharsetName(From), to = ControlPanelForm.CharsetName(To);
+            SetStatus(Lang.T($"Đã chuyển clipboard: {from} → {to} ({length} ký tự). Hãy dán (Ctrl+V).",
+                             $"Clipboard converted: {from} → {to} ({length} chars). Paste with Ctrl+V."));
+            this.ShowSuccessTip(Lang.T("Đã chuyển mã clipboard", "Clipboard converted"));
         }
         catch (Exception ex)
         {
@@ -128,15 +162,17 @@ internal sealed class ConverterForm : Form
     private void ConvertText()
     {
         _txtResult.Text = VietConverter.Convert(_txtSource.Text, From, To);
-        SetStatus(Lang.T($"Đã chuyển {_txtSource.TextLength} ký tự.", $"Converted {_txtSource.TextLength} characters."));
+        SetStatus(Lang.T($"Đã chuyển {_txtSource.Text.Length} ký tự.", $"Converted {_txtSource.Text.Length} characters."));
     }
 
     private void ConvertFile()
     {
+        string filter = Lang.T("File văn bản", "Text files") + " (*.txt;*.csv;*.htm;*.html)|*.txt;*.csv;*.htm;*.html|" +
+                        Lang.T("Tất cả", "All files") + " (*.*)|*.*";
         using var open = new OpenFileDialog
         {
             Title = Lang.T("Chọn file nguồn", "Choose source file") + $" ({ControlPanelForm.CharsetName(From)})",
-            Filter = Lang.T("File văn bản", "Text files") + " (*.txt;*.csv;*.htm;*.html)|*.txt;*.csv;*.htm;*.html|" + Lang.T("Tất cả", "All files") + " (*.*)|*.*",
+            Filter = filter,
         };
         if (open.ShowDialog(this) != DialogResult.OK)
             return;
@@ -146,7 +182,7 @@ internal sealed class ConverterForm : Form
             Title = Lang.T("Lưu kết quả", "Save result") + $" ({ControlPanelForm.CharsetName(To)})",
             FileName = Path.GetFileNameWithoutExtension(open.FileName) + "_" + To + Path.GetExtension(open.FileName),
             InitialDirectory = Path.GetDirectoryName(open.FileName),
-            Filter = open.Filter,
+            Filter = filter,
         };
         if (save.ShowDialog(this) != DialogResult.OK)
             return;

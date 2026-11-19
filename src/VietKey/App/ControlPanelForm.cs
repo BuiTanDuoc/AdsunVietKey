@@ -1,67 +1,59 @@
 using System.Diagnostics;
+using Sunny.UI;
 using VietKey.Core.Conversion;
 using VietKey.Core.Engine;
 
 namespace VietKey.App;
 
 /// <summary>
-/// Bảng điều khiển theo bố cục UniKey: phần "Điều khiển" luôn hiện,
+/// Bảng điều khiển (SunnyUI) theo bố cục UniKey: phần "Điều khiển" luôn hiện,
 /// nút "Mở rộng"/"Thu nhỏ" bật/tắt phần tuỳ chọn. Mọi thay đổi có hiệu lực ngay.
 /// </summary>
-internal sealed class ControlPanelForm : Form
+internal sealed class ControlPanelForm : UIForm
 {
     /// <summary>Thứ tự bảng mã trong ô "Bảng mã".</summary>
     public static readonly VietCharset[] Charsets =
         { VietCharset.Unicode, VietCharset.Tcvn3, VietCharset.VniWindows, VietCharset.UnicodeComposite };
 
+    private const int LogicalWidth = 680, TopHeight = 165, ExtHeight = 426, BottomHeight = 72;
+
     private readonly AppSettings _settings;
+    private readonly float _k;
     private bool _loading;
     private bool _expanded;
 
-    // Điều khiển
-    private readonly GroupBox _gbControl = Group(20, 8, 460, 145);
-    private readonly Label _lblCharset = Lbl(14, 30);
-    private readonly ComboBox _cbCharset = Combo(138, 26, 280);
-    private readonly Label _lblMethod = Lbl(14, 70);
-    private readonly ComboBox _cbMethod = Combo(138, 66, 220);
-    private readonly Button _btnCustomMethod = new() { Text = "···", Location = new Point(372, 65), Size = new Size(44, 27), Enabled = false };
-    private readonly Label _lblHotkey = Lbl(14, 108);
-    private readonly RadioButton _rbCtrlShift = new() { Text = "CTRL + SHIFT", Location = new Point(138, 106), AutoSize = true };
-    private readonly RadioButton _rbAltZ = new() { Text = "ALT + Z", Location = new Point(296, 106), AutoSize = true };
+    private readonly Panel _top = new(), _ext = new(), _bottom = new();
 
-    private readonly Button _btnClose = Big(500, 14);
-    private readonly Button _btnExit = Big(500, 72);
-    private readonly Button _btnExpand = Big(500, 130);
+    // Điều khiển
+    private readonly UIGroupBox _gbControl;
+    private readonly UILabel _lblCharset, _lblMethod, _lblHotkey;
+    private readonly UIComboBox _cbCharset, _cbMethod;
+    private readonly UIButton _btnCustomMethod;
+    private readonly UIRadioButton _rbCtrlShift, _rbAltZ;
+    private readonly UISymbolButton _btnClose, _btnExit, _btnExpand;
 
     // Tuỳ chọn khác
-    private readonly GroupBox _gbOther = Group(20, 4, 640, 160);
-    private readonly CheckBox _cbFree = Check(14, 26);
-    private readonly CheckBox _cbModern = Check(14, 58);
-    private readonly CheckBox _cbClipboard = Check(14, 90);
-    private readonly CheckBox _cbSpell = Check(340, 26);
-    private readonly CheckBox _cbRestore = Check(340, 58);
-    private readonly CheckBox _cbFeedback = Check(340, 90);
-    private readonly CheckBox _cbBeep = Check(340, 122);
+    private readonly UIGroupBox _gbOther;
+    private readonly UICheckBox _cbFree, _cbModern, _cbClipboard, _cbSpell, _cbRestore, _cbFeedback, _cbBeep;
 
     // Gõ tắt
-    private readonly GroupBox _gbMacro = Group(20, 174, 320, 140);
-    private readonly CheckBox _cbMacro = Check(14, 26);
-    private readonly CheckBox _cbMacroOff = Check(14, 56);
-    private readonly Button _btnMacroTable = new() { Location = new Point(16, 92), Size = new Size(160, 34) };
+    private readonly UIGroupBox _gbMacro;
+    private readonly UICheckBox _cbMacro, _cbMacroOff;
+    private readonly UISymbolButton _btnMacroTable;
 
     // Hệ thống
-    private readonly GroupBox _gbSystem = Group(350, 174, 310, 140);
-    private readonly CheckBox _cbShowOnStart = Check(14, 26);
-    private readonly CheckBox _cbStartup = Check(14, 56);
-    private readonly CheckBox _cbVnUi = new() { Text = "Vietnamese interface", Location = new Point(14, 86), AutoSize = true };
+    private readonly UIGroupBox _gbSystem;
+    private readonly UICheckBox _cbShowOnStart, _cbStartup, _cbVnUi;
+
+    // Giao diện
+    private readonly UIGroupBox _gbTheme;
+    private readonly UILabel _lblTheme, _lblColor;
+    private readonly UIComboBox _cbTheme;
+    private readonly UIColorPicker _colorPicker;
 
     // Hàng nút dưới
-    private readonly Button _btnHelp = BottomButton(26);
-    private readonly Button _btnAbout = BottomButton(184);
-    private readonly Button _btnDefault = BottomButton(342);
-    private readonly LinkLabel _lnkData = new() { Location = new Point(496, 27), AutoSize = true };
-
-    private readonly Panel _extPanel;
+    private readonly UISymbolButton _btnHelp, _btnAbout, _btnDefault;
+    private readonly UILinkLabel _lnkData;
 
     public event EventHandler? SettingsChanged;
     public event EventHandler? ExitRequested;
@@ -70,70 +62,155 @@ internal sealed class ControlPanelForm : Form
     public ControlPanelForm(AppSettings settings, Icon? icon)
     {
         _settings = settings;
+        _k = UiKit.Scale(this);
 
         SuspendLayout();
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
-        Font = new Font("Segoe UI", 10f);
-        FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
         MinimizeBox = false;
-        StartPosition = FormStartPosition.CenterScreen;
-        AutoSize = true;
-        AutoSizeMode = AutoSizeMode.GrowAndShrink;
-        ShowInTaskbar = true;
+        ShowTitleIcon = icon is not null;
         if (icon is not null) Icon = icon;
+        StartPosition = FormStartPosition.CenterScreen;
+        ShowInTaskbar = true;
+        EscClose = true;
+        TitleHeight = S(36);
 
         // ---- phần trên
-        _gbControl.Controls.AddRange(new Control[]
-        {
-            _lblCharset, _cbCharset, _lblMethod, _cbMethod, _btnCustomMethod, _lblHotkey, _rbCtrlShift, _rbAltZ,
-        });
-        var topPanel = PanelOf(165, _gbControl, _btnClose, _btnExit, _btnExpand);
+        _gbControl = Group(_top, 20, 8, 460, 148);
+        _lblCharset = Lbl(_gbControl, 14, 40);
+        _cbCharset = Combo(_gbControl, 138, 36, 290);
+        _lblMethod = Lbl(_gbControl, 14, 78);
+        _cbMethod = Combo(_gbControl, 138, 74, 228);
+        _btnCustomMethod = new UIButton { Text = "···", Enabled = false };
+        Place(_gbControl, _btnCustomMethod, 376, 74, 52, 29);
+        _lblHotkey = Lbl(_gbControl, 14, 114);
+        _rbCtrlShift = Radio(_gbControl, 138, 112, 150);
+        _rbAltZ = Radio(_gbControl, 300, 112, 120);
+        _rbCtrlShift.Text = "CTRL + SHIFT";
+        _rbAltZ.Text = "ALT + Z";
+
+        _btnClose = SymButton(_top, 500, 14, 150, 42, FontAwesomeIcons.fa_check);
+        _btnExit = SymButton(_top, 500, 66, 150, 42, FontAwesomeIcons.fa_power_off);
+        _btnExpand = SymButton(_top, 500, 118, 150, 42, FontAwesomeIcons.fa_angle_double_down);
 
         // ---- phần mở rộng
-        _gbOther.Controls.AddRange(new Control[] { _cbFree, _cbModern, _cbClipboard, _cbSpell, _cbRestore, _cbFeedback, _cbBeep });
-        _gbMacro.Controls.AddRange(new Control[] { _cbMacro, _cbMacroOff, _btnMacroTable });
-        _gbSystem.Controls.AddRange(new Control[] { _cbShowOnStart, _cbStartup, _cbVnUi });
-        _extPanel = PanelOf(324, _gbOther, _gbMacro, _gbSystem);
-        _extPanel.Visible = false;
+        _gbOther = Group(_ext, 20, 4, 640, 166);
+        _cbFree = Check(_gbOther, 14, 34);
+        _cbModern = Check(_gbOther, 14, 66);
+        _cbClipboard = Check(_gbOther, 14, 98);
+        _cbSpell = Check(_gbOther, 330, 34);
+        _cbRestore = Check(_gbOther, 330, 66);
+        _cbFeedback = Check(_gbOther, 330, 98);
+        _cbBeep = Check(_gbOther, 330, 130);
+
+        _gbMacro = Group(_ext, 20, 178, 320, 146);
+        _cbMacro = Check(_gbMacro, 14, 34);
+        _cbMacroOff = Check(_gbMacro, 14, 66);
+        _btnMacroTable = SymButton(_gbMacro, 16, 100, 180, 34, FontAwesomeIcons.fa_list);
+
+        _gbSystem = Group(_ext, 350, 178, 310, 146);
+        _cbShowOnStart = Check(_gbSystem, 14, 34);
+        _cbStartup = Check(_gbSystem, 14, 66);
+        _cbVnUi = Check(_gbSystem, 14, 98);
+        _cbVnUi.Text = "Vietnamese interface";
+
+        _gbTheme = Group(_ext, 20, 332, 640, 86);
+        _lblTheme = Lbl(_gbTheme, 14, 44);
+        _cbTheme = Combo(_gbTheme, 110, 40, 250);
+        _lblColor = Lbl(_gbTheme, 384, 44);
+        _colorPicker = new UIColorPicker();
+        Place(_gbTheme, _colorPicker, 460, 40, 160, 29);
 
         // ---- hàng nút dưới
-        var bottomPanel = PanelOf(72, _btnHelp, _btnAbout, _btnDefault, _lnkData);
+        _btnHelp = SymButton(_bottom, 26, 14, 140, 44, FontAwesomeIcons.fa_book);
+        _btnAbout = SymButton(_bottom, 182, 14, 140, 44, FontAwesomeIcons.fa_info_circle);
+        _btnDefault = SymButton(_bottom, 338, 14, 140, 44, FontAwesomeIcons.fa_refresh);
+        _lnkData = new UILinkLabel { AutoSize = true };
+        Place(_bottom, _lnkData, 500, 28, 150, 24);
 
-        var stack = new TableLayoutPanel
-        {
-            ColumnCount = 1,
-            AutoSize = true,
-            AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            Margin = Padding.Empty,
-            Padding = Padding.Empty,
-        };
-        stack.Controls.Add(topPanel);
-        stack.Controls.Add(_extPanel);
-        stack.Controls.Add(bottomPanel);
-        Controls.Add(stack);
+        Controls.Add(_top);
+        Controls.Add(_ext);
+        Controls.Add(_bottom);
+        _ext.Visible = false;
+
+        UiKit.ApplyFont(this);
+        TitleFont = UiKit.NewFont(11f);
+        foreach (var b in new[] { _btnClose, _btnExit, _btnExpand, _btnHelp, _btnAbout, _btnDefault, _btnMacroTable })
+            b.SymbolSize = S(20);
 
         WireEvents();
         ApplyTexts();
         LoadValues();
+        Relayout();
         ResumeLayout(true);
     }
 
     // ------------------------------------------------------------ dựng control
 
-    private static GroupBox Group(int x, int y, int w, int h) => new() { Location = new Point(x, y), Size = new Size(w, h) };
-    private static Label Lbl(int x, int y) => new() { Location = new Point(x, y), AutoSize = true };
-    private static ComboBox Combo(int x, int y, int w) => new() { Location = new Point(x, y), Width = w, DropDownStyle = ComboBoxStyle.DropDownList };
-    private static CheckBox Check(int x, int y) => new() { Location = new Point(x, y), AutoSize = true };
-    private static Button Big(int x, int y) => new() { Location = new Point(x, y), Size = new Size(122, 42) };
-    private static Button BottomButton(int x) => new() { Location = new Point(x, 12), Size = new Size(138, 46) };
+    private int S(int logical) => (int)Math.Round(logical * _k);
 
-    private static Panel PanelOf(int height, params Control[] children)
+    private void Place(Control parent, Control c, int x, int y, int w, int h)
     {
-        var panel = new Panel { Size = new Size(680, height), Margin = Padding.Empty };
-        panel.Controls.AddRange(children);
-        return panel;
+        c.SetBounds(S(x), S(y), S(w), S(h));
+        parent.Controls.Add(c);
+    }
+
+    private UIGroupBox Group(Control parent, int x, int y, int w, int h)
+    {
+        var g = new UIGroupBox();
+        Place(parent, g, x, y, w, h);
+        return g;
+    }
+
+    private UILabel Lbl(Control parent, int x, int y)
+    {
+        var l = new UILabel { AutoSize = true, BackColor = Color.Transparent };
+        Place(parent, l, x, y, 110, 24);
+        return l;
+    }
+
+    private UIComboBox Combo(Control parent, int x, int y, int w)
+    {
+        var c = new UIComboBox { DropDownStyle = UIDropDownStyle.DropDownList };
+        Place(parent, c, x, y, w, 29);
+        return c;
+    }
+
+    private UICheckBox Check(Control parent, int x, int y)
+    {
+        var c = new UICheckBox { AutoSize = true };
+        Place(parent, c, x, y, 290, 29);
+        return c;
+    }
+
+    private UIRadioButton Radio(Control parent, int x, int y, int w)
+    {
+        var r = new UIRadioButton();
+        Place(parent, r, x, y, w, 29);
+        return r;
+    }
+
+    private UISymbolButton SymButton(Control parent, int x, int y, int w, int h, int symbol)
+    {
+        var b = new UISymbolButton { Symbol = symbol };
+        Place(parent, b, x, y, w, h);
+        return b;
+    }
+
+    /// <summary>Xếp ba phần theo chiều dọc và đặt lại kích thước form (thu nhỏ / mở rộng).</summary>
+    private void Relayout()
+    {
+        int y = TitleHeight;
+        _top.SetBounds(0, y, S(LogicalWidth), S(TopHeight));
+        y += S(TopHeight);
+        _ext.Visible = _expanded;
+        if (_expanded)
+        {
+            _ext.SetBounds(0, y, S(LogicalWidth), S(ExtHeight));
+            y += S(ExtHeight);
+        }
+        _bottom.SetBounds(0, y, S(LogicalWidth), S(BottomHeight));
+        y += S(BottomHeight);
+        ClientSize = new Size(S(LogicalWidth), y);
     }
 
     // ------------------------------------------------------------ chữ hiển thị
@@ -146,9 +223,9 @@ internal sealed class ControlPanelForm : Form
         _lblCharset.Text = Lang.T("Bảng mã:", "Charset:");
         _lblMethod.Text = Lang.T("Kiểu gõ:", "Input method:");
         _lblHotkey.Text = Lang.T("Phím chuyển:", "Switch key:");
-        _btnClose.Text = Lang.T("✔  Đóng", "✔  Close");
-        _btnExit.Text = Lang.T("⏻  Kết thúc", "⏻  Exit");
-        UpdateExpandText();
+        _btnClose.Text = Lang.T("Đóng", "Close");
+        _btnExit.Text = Lang.T("Kết thúc", "Exit");
+        UpdateExpandButton();
 
         _gbOther.Text = Lang.T("Tùy chọn khác", "Other options");
         _cbFree.Text = Lang.T("Cho phép gõ tự do", "Free marking");
@@ -168,21 +245,29 @@ internal sealed class ControlPanelForm : Form
         _cbShowOnStart.Text = Lang.T("Bật hội thoại này khi khởi động", "Show this dialog at startup");
         _cbStartup.Text = Lang.T("Khởi động cùng Windows", "Run at Windows startup");
 
-        _btnHelp.Text = Lang.T("📖  Hướng dẫn", "📖  Help");
+        _gbTheme.Text = Lang.T("Giao diện", "Appearance");
+        _lblTheme.Text = Lang.T("Theme:", "Theme:");
+        _lblColor.Text = Lang.T("Màu:", "Color:");
+
+        _btnHelp.Text = Lang.T("Hướng dẫn", "Help");
         _btnAbout.Text = Lang.T("Thông tin", "About");
         _btnDefault.Text = Lang.T("Mặc định", "Default");
         _lnkData.Text = Lang.T("Thư mục dữ liệu", "Data folder");
 
-        int selectedCharset = _cbCharset.SelectedIndex, selectedMethod = _cbMethod.SelectedIndex;
         bool wasLoading = _loading;
         _loading = true;
+        int charset = _cbCharset.SelectedIndex, method = _cbMethod.SelectedIndex, theme = _cbTheme.SelectedIndex;
         _cbCharset.Items.Clear();
         foreach (var c in Charsets)
             _cbCharset.Items.Add(CharsetName(c));
         _cbMethod.Items.Clear();
         _cbMethod.Items.AddRange(new object[] { "Telex", "VNI" });
-        _cbCharset.SelectedIndex = selectedCharset;
-        _cbMethod.SelectedIndex = selectedMethod;
+        _cbTheme.Items.Clear();
+        foreach (var t in UiKit.Themes)
+            _cbTheme.Items.Add(UiKit.ThemeName(t));
+        _cbCharset.SelectedIndex = charset;
+        _cbMethod.SelectedIndex = method;
+        _cbTheme.SelectedIndex = theme;
         _loading = wasLoading;
     }
 
@@ -194,8 +279,11 @@ internal sealed class ControlPanelForm : Form
         _ => VietConverter.DisplayName(c),
     };
 
-    private void UpdateExpandText() =>
-        _btnExpand.Text = _expanded ? Lang.T("⇧  Thu nhỏ", "⇧  Less") : Lang.T("⇩  Mở rộng", "⇩  More");
+    private void UpdateExpandButton()
+    {
+        _btnExpand.Text = _expanded ? Lang.T("Thu nhỏ", "Less") : Lang.T("Mở rộng", "More");
+        _btnExpand.Symbol = _expanded ? FontAwesomeIcons.fa_angle_double_up : FontAwesomeIcons.fa_angle_double_down;
+    }
 
     // ------------------------------------------------------------ giá trị
 
@@ -223,6 +311,10 @@ internal sealed class ControlPanelForm : Form
         _cbShowOnStart.Checked = _settings.ShowPanelOnStartup;
         _cbStartup.Checked = SafeRunAtStartup();
         _cbVnUi.Checked = _settings.VietnameseInterface;
+
+        _cbTheme.SelectedIndex = Math.Max(0, Array.IndexOf(UiKit.Themes, _settings.Theme));
+        _colorPicker.Value = Color.FromArgb(_settings.ThemeColor);
+        _colorPicker.Enabled = _settings.Theme == UIStyle.Colorful;
         _loading = false;
     }
 
@@ -253,8 +345,12 @@ internal sealed class ControlPanelForm : Form
         bool languageChanged = _settings.VietnameseInterface != _cbVnUi.Checked;
         _settings.VietnameseInterface = _cbVnUi.Checked;
 
+        _settings.Theme = UiKit.Themes[Math.Max(0, _cbTheme.SelectedIndex)];
+        _settings.ThemeColor = _colorPicker.Value.ToArgb();
+
         _cbRestore.Enabled = _cbSpell.Checked;
         _cbMacroOff.Enabled = _cbMacro.Checked;
+        _colorPicker.Enabled = _settings.Theme == UIStyle.Colorful;
 
         if (languageChanged)
         {
@@ -274,12 +370,13 @@ internal sealed class ControlPanelForm : Form
 
     private void WireEvents()
     {
-        foreach (var cb in new[] { _cbCharset, _cbMethod })
+        foreach (var cb in new[] { _cbCharset, _cbMethod, _cbTheme })
             cb.SelectedIndexChanged += (_, _) => SaveValues();
         foreach (var rb in new[] { _rbCtrlShift, _rbAltZ })
-            rb.CheckedChanged += (_, _) => { if (((RadioButton)rb).Checked) SaveValues(); };
+            rb.CheckedChanged += (_, _) => { if (rb.Checked) SaveValues(); };
         foreach (var c in new[] { _cbFree, _cbModern, _cbClipboard, _cbSpell, _cbRestore, _cbFeedback, _cbBeep, _cbMacro, _cbMacroOff, _cbShowOnStart, _cbVnUi })
             c.CheckedChanged += (_, _) => SaveValues();
+        _colorPicker.ValueChanged += (_, _) => SaveValues();
 
         _cbStartup.CheckedChanged += (_, _) =>
         {
@@ -290,7 +387,7 @@ internal sealed class ControlPanelForm : Form
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                UiKit.Error(ex.Message);
             }
         };
 
@@ -299,12 +396,12 @@ internal sealed class ControlPanelForm : Form
         _btnExpand.Click += (_, _) =>
         {
             _expanded = !_expanded;
-            _extPanel.Visible = _expanded;
-            UpdateExpandText();
+            UpdateExpandButton();
+            Relayout();
         };
         _btnMacroTable.Click += (_, _) => EditMacrosRequested?.Invoke(this, EventArgs.Empty);
-        _btnHelp.Click += (_, _) => ShowHelp(this);
-        _btnAbout.Click += (_, _) => ShowAbout(this);
+        _btnHelp.Click += (_, _) => ShowHelp();
+        _btnAbout.Click += (_, _) => ShowAbout();
         _btnDefault.Click += (_, _) =>
         {
             _settings.ResetToDefaults();
@@ -319,40 +416,73 @@ internal sealed class ControlPanelForm : Form
 
     // ------------------------------------------------------------ hướng dẫn / thông tin
 
-    public static void ShowHelp(IWin32Window? owner)
+    public static void ShowHelp()
     {
         string text = Lang.T(
-            "TELEX: s=sắc  f=huyền  r=hỏi  x=ngã  j=nặng  z=xoá dấu\n" +
-            "       aa=â  ee=ê  oo=ô  aw=ă  ow=ơ  uw=ư  uow=ươ  w=ư  dd=đ\n\n" +
-            "VNI:   1=sắc  2=huyền  3=hỏi  4=ngã  5=nặng  0=xoá dấu\n" +
-            "       6=â ê ô  7=ơ ư  8=ă  9=đ\n\n" +
-            "Gõ lại phím dấu để huỷ (ass → as).\n\n" +
-            "Phím tắt:\n" +
-            "  Ctrl+Shift (hoặc Alt+Z)   chuyển Việt/Anh\n" +
-            "  Ctrl+Shift+F5             Bảng điều khiển\n" +
-            "  Ctrl+Shift+F6             Công cụ chuyển mã\n" +
-            "  Ctrl+Shift+F9             Chuyển mã nhanh clipboard\n\n" +
-            "Bấm chuột trái vào biểu tượng V/E ở khay hệ thống để chuyển Việt/Anh.",
-            "TELEX: s=acute  f=grave  r=hook  x=tilde  j=dot  z=remove tone\n" +
-            "       aa=â  ee=ê  oo=ô  aw=ă  ow=ơ  uw=ư  uow=ươ  w=ư  dd=đ\n\n" +
-            "VNI:   1=acute  2=grave  3=hook  4=tilde  5=dot  0=remove tone\n" +
-            "       6=â ê ô  7=ơ ư  8=ă  9=đ\n\n" +
-            "Type a mark key twice to undo it (ass → as).\n\n" +
-            "Hotkeys:\n" +
-            "  Ctrl+Shift (or Alt+Z)     switch Vietnamese/English\n" +
-            "  Ctrl+Shift+F5             Control panel\n" +
-            "  Ctrl+Shift+F6             Converter toolkit\n" +
-            "  Ctrl+Shift+F9             Quick clipboard conversion\n\n" +
-            "Left-click the V/E tray icon to switch Vietnamese/English.");
-        MessageBox.Show(owner, text, Lang.T("VietKey – Hướng dẫn", "VietKey – Help"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+            "TELEX   s=sắc  f=huyền  r=hỏi  x=ngã  j=nặng  z=xoá dấu\r\n" +
+            "        aa=â  ee=ê  oo=ô  aw=ă  ow=ơ  uw=ư  uow=ươ  w=ư  dd=đ\r\n\r\n" +
+            "VNI     1=sắc  2=huyền  3=hỏi  4=ngã  5=nặng  0=xoá dấu\r\n" +
+            "        6=â ê ô  7=ơ ư  8=ă  9=đ\r\n\r\n" +
+            "Gõ lại phím dấu để huỷ (ass → as).\r\n\r\n" +
+            "PHÍM TẮT\r\n" +
+            "  Ctrl+Shift (hoặc Alt+Z)  chuyển Việt/Anh\r\n" +
+            "  Ctrl+Shift+F5            Bảng điều khiển\r\n" +
+            "  Ctrl+Shift+F6            Công cụ chuyển mã\r\n" +
+            "  Ctrl+Shift+F9            Chuyển mã nhanh clipboard\r\n\r\n" +
+            "Bấm chuột trái vào biểu tượng V/E ở khay hệ thống để chuyển Việt/Anh.\r\n" +
+            "Theme và màu giao diện: Bảng điều khiển → Mở rộng → Giao diện.",
+            "TELEX   s=acute  f=grave  r=hook  x=tilde  j=dot  z=remove tone\r\n" +
+            "        aa=â  ee=ê  oo=ô  aw=ă  ow=ơ  uw=ư  uow=ươ  w=ư  dd=đ\r\n\r\n" +
+            "VNI     1=acute  2=grave  3=hook  4=tilde  5=dot  0=remove tone\r\n" +
+            "        6=â ê ô  7=ơ ư  8=ă  9=đ\r\n\r\n" +
+            "Type a mark key twice to undo it (ass → as).\r\n\r\n" +
+            "HOTKEYS\r\n" +
+            "  Ctrl+Shift (or Alt+Z)    switch Vietnamese/English\r\n" +
+            "  Ctrl+Shift+F5            Control panel\r\n" +
+            "  Ctrl+Shift+F6            Converter toolkit\r\n" +
+            "  Ctrl+Shift+F9            Quick clipboard conversion\r\n\r\n" +
+            "Left-click the V/E tray icon to switch Vietnamese/English.\r\n" +
+            "Theme and color: Control panel → More → Appearance.");
+        new TextViewForm(Lang.T("VietKey – Hướng dẫn", "VietKey – Help"), text).Show();
     }
 
-    public static void ShowAbout(IWin32Window? owner)
+    public static void ShowAbout()
     {
         string version = Application.ProductVersion.Split('+')[0];
-        MessageBox.Show(owner,
-            Lang.T($"VietKey {version}\nBộ gõ tiếng Việt Telex/VNI viết bằng C# .NET 8 WinForms.\nBố cục giao diện theo UniKey.",
-                   $"VietKey {version}\nVietnamese Telex/VNI input method written in C# .NET 8 WinForms.\nUI layout modelled on UniKey."),
-            Lang.T("Thông tin", "About"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+        UiKit.Info(
+            Lang.T($"VietKey {version}\nBộ gõ tiếng Việt Telex/VNI viết bằng C# .NET 8 WinForms, giao diện SunnyUI.\nBố cục theo UniKey.",
+                   $"VietKey {version}\nVietnamese Telex/VNI input method in C# .NET 8 WinForms with SunnyUI.\nLayout modelled on UniKey."),
+            Lang.T("Thông tin", "About"));
+    }
+}
+
+/// <summary>Cửa sổ hiển thị văn bản chỉ đọc (Hướng dẫn).</summary>
+internal sealed class TextViewForm : UIForm
+{
+    public TextViewForm(string title, string text)
+    {
+        float k = UiKit.Scale(this);
+        Text = title;
+        StartPosition = FormStartPosition.CenterScreen;
+        MaximizeBox = false;
+        MinimizeBox = false;
+        EscClose = true;
+        TitleHeight = (int)(36 * k);
+        ClientSize = new Size((int)(640 * k), (int)(470 * k));
+
+        var box = new UITextBox
+        {
+            Multiline = true,
+            ReadOnly = true,
+            ShowScrollBar = true,
+            Dock = DockStyle.Fill,
+            Text = text,
+        };
+        var host = new Panel { Dock = DockStyle.Fill, Padding = new Padding((int)(12 * k)) };
+        host.Controls.Add(box);
+        Controls.Add(host);
+
+        TitleFont = UiKit.NewFont(11f);
+        box.Font = new Font("Consolas", 10.5f);
     }
 }

@@ -1,71 +1,77 @@
+using Sunny.UI;
 using VietKey.Core.Macros;
 
 namespace VietKey.App;
 
-/// <summary>Soạn bảng gõ tắt: lưới hai cột "Gõ tắt" / "Thay thế".</summary>
-internal sealed class MacroEditorForm : Form
+/// <summary>Soạn bảng gõ tắt (SunnyUI): lưới hai cột "Gõ tắt" / "Thay thế".</summary>
+internal sealed class MacroEditorForm : UIForm
 {
     private readonly MacroTable _table;
     private readonly string _filePath;
-    private readonly DataGridView _grid = new()
+    private readonly UIDataGridView _grid = new()
     {
         Dock = DockStyle.Fill,
         AllowUserToAddRows = true,
         AllowUserToDeleteRows = true,
         AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-        RowHeadersWidth = 28,
-        SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+        SelectionMode = DataGridViewSelectionMode.CellSelect,
+        RowHeadersVisible = false,
     };
-
-    public event EventHandler? Saved;
 
     public MacroEditorForm(MacroTable table, string filePath, Icon? icon)
     {
         _table = table;
         _filePath = filePath;
+        float k = UiKit.Scale(this);
+        int S(int v) => (int)Math.Round(v * k);
 
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
         Text = Lang.T("VietKey – Bảng gõ tắt", "VietKey – Macro table");
-        Font = new Font("Segoe UI", 10f);
         StartPosition = FormStartPosition.CenterScreen;
-        Size = new Size(560, 460);
-        MinimumSize = new Size(420, 300);
+        ShowTitleIcon = icon is not null;
         if (icon is not null) Icon = icon;
+        EscClose = true;
+        TitleHeight = S(36);
+        MinimumSize = new Size(S(460), S(340));
+        ClientSize = new Size(S(600), S(500));
 
-        var colKey = new DataGridViewTextBoxColumn { HeaderText = Lang.T("Gõ tắt", "Abbreviation"), FillWeight = 30 };
-        var colValue = new DataGridViewTextBoxColumn { HeaderText = Lang.T("Thay thế", "Replacement"), FillWeight = 70 };
-        _grid.Columns.AddRange(colKey, colValue);
+        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = Lang.T("Gõ tắt", "Abbreviation"), FillWeight = 30 });
+        _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = Lang.T("Thay thế", "Replacement"), FillWeight = 70 });
         foreach (var (key, value) in table.Entries)
             _grid.Rows.Add(key, value);
 
-        var hint = new Label
+        var hint = new UILabel
         {
             Dock = DockStyle.Top,
-            Height = 44,
-            Padding = new Padding(6, 6, 6, 0),
+            Height = S(52),
+            BackColor = Color.Transparent,
             Text = Lang.T(
-                "Gõ từ tắt rồi nhấn Space/Enter để thay. Gõ \"Vn\" → viết hoa chữ đầu, \"VN\" → viết hoa toàn bộ.",
-                "Type an abbreviation then Space/Enter. \"Vn\" capitalises the first letter, \"VN\" the whole text."),
+                "Gõ từ tắt rồi nhấn Space/Enter để thay. \"Vn\" → viết hoa chữ đầu, \"VN\" → viết hoa toàn bộ. Dòng mới ở cuối bảng.",
+                "Type an abbreviation then Space/Enter. \"Vn\" capitalises the first letter, \"VN\" the whole text. Add rows at the bottom."),
         };
 
-        var save = new Button { Text = Lang.T("Lưu", "Save"), AutoSize = true };
-        var close = new Button { Text = Lang.T("Đóng", "Close"), AutoSize = true, DialogResult = DialogResult.Cancel };
+        var save = new UISymbolButton { Text = Lang.T("Lưu", "Save"), Symbol = FontAwesomeIcons.fa_check, Size = new Size(S(120), S(38)), SymbolSize = S(18) };
+        var close = new UISymbolButton { Text = Lang.T("Đóng", "Close"), Symbol = FontAwesomeIcons.fa_times, Size = new Size(S(120), S(38)), SymbolSize = S(18) };
         save.Click += (_, _) => SaveTable();
-        CancelButton = close;
+        close.Click += (_, _) => Close();
 
         var buttons = new FlowLayoutPanel
         {
             Dock = DockStyle.Bottom,
-            AutoSize = true,
+            Height = S(56),
             FlowDirection = FlowDirection.RightToLeft,
-            Padding = new Padding(6),
+            Padding = new Padding(S(6)),
         };
         buttons.Controls.AddRange(new Control[] { close, save });
 
-        Controls.Add(_grid);
-        Controls.Add(hint);
+        var host = new Panel { Dock = DockStyle.Fill, Padding = new Padding(S(10), S(4), S(10), 0) };
+        host.Controls.Add(_grid);
+        host.Controls.Add(hint);
+
+        Controls.Add(host);
         Controls.Add(buttons);
+
+        UiKit.ApplyFont(this);
+        TitleFont = UiKit.NewFont(11f);
     }
 
     private void SaveTable()
@@ -82,8 +88,7 @@ internal sealed class MacroEditorForm : Form
                 continue;
             if (key.Any(char.IsWhiteSpace))
             {
-                MessageBox.Show(this, Lang.T($"Từ gõ tắt \"{key}\" không được chứa khoảng trắng.", $"Abbreviation \"{key}\" must not contain spaces."),
-                    Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                UiKit.Error(Lang.T($"Từ gõ tắt \"{key}\" không được chứa khoảng trắng.", $"Abbreviation \"{key}\" must not contain spaces."), Text);
                 return;
             }
             fresh.Set(key, value);
@@ -98,12 +103,11 @@ internal sealed class MacroEditorForm : Form
             foreach (var (key, value) in fresh.Entries)
                 _table.Set(key, value);
 
-            Saved?.Invoke(this, EventArgs.Empty);
             Close();
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            UiKit.Error(ex.Message, Text);
         }
     }
 }

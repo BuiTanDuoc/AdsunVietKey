@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.Win32;
+using Sunny.UI;
 using VietKey.Core.Conversion;
 using VietKey.Core.Engine;
 
@@ -41,6 +42,10 @@ internal sealed class AppSettings
     public bool ShowPanelOnStartup { get; set; }
     public bool VietnameseInterface { get; set; } = true;
 
+    // Giao diện (SunnyUI)
+    public UIStyle Theme { get; set; } = UIStyle.Blue;
+    public int ThemeColor { get; set; } = unchecked((int)0xFF00BEAC); // màu cho theme "Tuỳ chọn màu"
+
     // Công cụ chuyển mã
     public VietCharset ConvertFrom { get; set; } = VietCharset.Tcvn3;
     public VietCharset ConvertTo { get; set; } = VietCharset.Unicode;
@@ -73,6 +78,8 @@ internal sealed class AppSettings
 
                 if (p.PropertyType == typeof(bool))
                     p.SetValue(s, raw != 0);
+                else if (p.PropertyType == typeof(int))
+                    p.SetValue(s, raw);
                 else if (p.PropertyType.IsEnum && Enum.IsDefined(p.PropertyType, raw))
                     p.SetValue(s, Enum.ToObject(p.PropertyType, raw));
             }
@@ -97,9 +104,15 @@ internal sealed class AppSettings
             foreach (var p in InstanceProperties)
             {
                 object? value = p.GetValue(this);
+                if (value is int iv)
+                {
+                    key.SetValue(p.Name, iv, RegistryValueKind.DWord);
+                    continue;
+                }
                 int raw = value switch
                 {
                     bool b => b ? 1 : 0,
+                    int i => i,
                     Enum e => Convert.ToInt32(e),
                     _ => int.MinValue,
                 };

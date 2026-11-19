@@ -1,4 +1,5 @@
 using System.Media;
+using Sunny.UI;
 using System.Text;
 using VietKey.Core;
 using VietKey.Core.Conversion;
@@ -17,7 +18,7 @@ internal sealed class TrayApp : ApplicationContext
     private readonly MacroTable _macros = new();
     private readonly KeyboardHook _hook;
     private readonly NotifyIcon _tray;
-    private readonly ContextMenuStrip _menu = new();
+    private readonly UIContextMenuStrip _menu = new();
     private readonly Control _invoker = new(); // chạy việc trên luồng UI sau khi hook trả về
 
     private Icon? _iconVi;
@@ -25,6 +26,8 @@ internal sealed class TrayApp : ApplicationContext
     private ControlPanelForm? _panel;
     private ConverterForm? _converter;
     private MacroEditorForm? _macroEditor;
+    private UIStyle? _appliedTheme;
+    private int _appliedColor;
 
     private static string MacroFile => Path.Combine(AppSettings.DataFolder, "macros.txt");
 
@@ -36,6 +39,10 @@ internal sealed class TrayApp : ApplicationContext
 
         _iconVi = IconFactory.Create(vietnamese: true);
         _iconEn = IconFactory.Create(vietnamese: false);
+
+        ApplyTheme();
+        _menu.Font = UiKit.NewFont(10f);
+        UiKit.RegisterMenu(_menu);
 
         _tray = new NotifyIcon { ContextMenuStrip = _menu, Visible = true };
         _tray.MouseUp += (_, e) =>
@@ -58,7 +65,7 @@ internal sealed class TrayApp : ApplicationContext
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "VietKey", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            UiKit.Error(ex.Message);
         }
 
         if (_settings.ShowPanelOnStartup)
@@ -75,7 +82,7 @@ internal sealed class TrayApp : ApplicationContext
         foreach (var item in old)
             item.Dispose();
 
-        _menu.Items.Add(Item(Lang.T("Hướng dẫn", "Help"), () => ControlPanelForm.ShowHelp(null)));
+        _menu.Items.Add(Item(Lang.T("Hướng dẫn", "Help"), ControlPanelForm.ShowHelp));
         _menu.Items.Add(Item(Lang.T("Công cụ...[CS+F6]", "Toolkit...[CS+F6]"), ShowConverter));
         _menu.Items.Add(Item(Lang.T("Chuyển mã nhanh - [CS+F9]", "Quick convert - [CS+F9]"), QuickConvert));
         _menu.Items.Add(new ToolStripSeparator());
@@ -170,7 +177,7 @@ internal sealed class TrayApp : ApplicationContext
             return;
         }
 
-        var form = new ConverterForm(_settings);
+        var form = new ConverterForm(_settings, _iconVi);
         form.CharsetsChanged += (_, _) => _settings.Save();
         form.FormClosed += (_, _) => _converter = null;
         _converter = form;
@@ -239,6 +246,7 @@ internal sealed class TrayApp : ApplicationContext
     private void ApplySettings()
     {
         Lang.Vietnamese = _settings.VietnameseInterface;
+        ApplyTheme();
 
         _engine.Method = _settings.Method;
         _engine.ModernToneStyle = _settings.ModernToneStyle;
@@ -256,6 +264,16 @@ internal sealed class TrayApp : ApplicationContext
         _tray.Text = text.Length > 63 ? text[..63] : text;
 
         _panel?.RefreshValues();
+    }
+
+    /// <summary>Đổi theme SunnyUI khi người dùng chọn theme/màu khác.</summary>
+    private void ApplyTheme()
+    {
+        if (_appliedTheme == _settings.Theme && (_settings.Theme != UIStyle.Colorful || _appliedColor == _settings.ThemeColor))
+            return;
+        _appliedTheme = _settings.Theme;
+        _appliedColor = _settings.ThemeColor;
+        UiKit.ApplyTheme(_settings.Theme, Color.FromArgb(_settings.ThemeColor));
     }
 
     private string StatusText()

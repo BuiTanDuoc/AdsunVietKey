@@ -8,11 +8,16 @@
     <Nullable>enable</Nullable>
     <RootNamespace>VietKey</RootNamespace>
     <AssemblyName>VietKey</AssemblyName>
-    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <Version>0.1.0</Version>
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+    <Version>0.3.0</Version>
     <Product>VietKey</Product>
     <Description>Bộ gõ tiếng Việt Telex/VNI viết bằng C# WinForms</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- SunnyUI: https://github.com/yhuse/SunnyUI (GPL-3.0) -->
+    <PackageReference Include="SunnyUI" Version="3.*" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\VietKey.Core\VietKey.Core.csproj" />

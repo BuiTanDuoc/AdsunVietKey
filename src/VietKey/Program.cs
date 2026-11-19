@@ -7,15 +7,16 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+        ApplicationConfiguration.Initialize();
+        UiKit.Initialize();
+
         using var mutex = new Mutex(initiallyOwned: true, @"Local\VietKey.SingleInstance", out bool isFirst);
         if (!isFirst)
         {
-            MessageBox.Show("VietKey đang chạy (xem icon ở khay hệ thống).", "VietKey",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            UiKit.Info("VietKey đang chạy (xem icon ở khay hệ thống).");
             return;
         }
 
-        ApplicationConfiguration.Initialize();
         Application.Run(new TrayApp());
     }
 }
