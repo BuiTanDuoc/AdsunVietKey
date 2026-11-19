@@ -1,8 +1,8 @@
-using VietKey.Core;
-using VietKey.Core.Engine;
+using AdsunVietKey.Core;
+using AdsunVietKey.Core.Engine;
 using Xunit;
 
-namespace VietKey.Core.Tests;
+namespace AdsunVietKey.Core.Tests;
 
 public class EngineTests
 {

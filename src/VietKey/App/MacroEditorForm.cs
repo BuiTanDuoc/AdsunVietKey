@@ -1,7 +1,7 @@
 using Sunny.UI;
-using VietKey.Core.Macros;
+using AdsunVietKey.Core.Macros;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Soạn bảng gõ tắt (SunnyUI): lưới hai cột "Gõ tắt" / "Thay thế".</summary>
 internal sealed class MacroEditorForm : UIForm
@@ -25,7 +25,7 @@ internal sealed class MacroEditorForm : UIForm
         float k = UiKit.Scale(this);
         int S(int v) => (int)Math.Round(v * k);
 
-        Text = Lang.T("VietKey – Bảng gõ tắt", "VietKey – Macro table");
+        Text = Lang.T("AdsunVietKey – Bảng gõ tắt", "AdsunVietKey – Macro table");
         StartPosition = FormStartPosition.CenterScreen;
         ShowTitleIcon = icon is not null;
         if (icon is not null) Icon = icon;

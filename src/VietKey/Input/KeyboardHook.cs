@@ -1,12 +1,12 @@
 using System.Runtime.InteropServices;
 using System.Text;
-using VietKey.App;
-using VietKey.Core;
-using VietKey.Core.Conversion;
-using VietKey.Core.Macros;
-using static VietKey.Native.NativeMethods;
+using AdsunVietKey.App;
+using AdsunVietKey.Core;
+using AdsunVietKey.Core.Conversion;
+using AdsunVietKey.Core.Macros;
+using static AdsunVietKey.Native.NativeMethods;
 
-namespace VietKey.Input;
+namespace AdsunVietKey.Input;
 
 /// <summary>Các phím tắt Ctrl+Shift+Fx giống UniKey.</summary>
 internal enum AppHotkey

@@ -1,10 +1,10 @@
 using System.Reflection;
 using Microsoft.Win32;
 using Sunny.UI;
-using VietKey.Core.Conversion;
-using VietKey.Core.Engine;
+using AdsunVietKey.Core.Conversion;
+using AdsunVietKey.Core.Engine;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 public enum ToggleHotkey
 {
@@ -12,12 +12,12 @@ public enum ToggleHotkey
     AltZ = 1,
 }
 
-/// <summary>Cấu hình, lưu tại HKCU\Software\VietKey. Giá trị mặc định giống UniKey.</summary>
+/// <summary>Cấu hình, lưu tại HKCU\Software\AdsunVietKey. Giá trị mặc định giống UniKey.</summary>
 internal sealed class AppSettings
 {
-    private const string KeyPath = @"Software\VietKey";
+    private const string KeyPath = @"Software\AdsunVietKey";
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string RunValueName = "VietKey";
+    private const string RunValueName = "AdsunVietKey";
 
     // Điều khiển
     public bool Enabled { get; set; } = true;
@@ -144,12 +144,12 @@ internal sealed class AppSettings
         }
     }
 
-    /// <summary>Thư mục dữ liệu: %AppData%\VietKey.</summary>
+    /// <summary>Thư mục dữ liệu: %AppData%\AdsunVietKey.</summary>
     public static string DataFolder
     {
         get
         {
-            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VietKey");
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AdsunVietKey");
             Directory.CreateDirectory(dir);
             return dir;
         }

@@ -1,13 +1,13 @@
 using System.Media;
 using Sunny.UI;
 using System.Text;
-using VietKey.Core;
-using VietKey.Core.Conversion;
-using VietKey.Core.Engine;
-using VietKey.Core.Macros;
-using VietKey.Input;
+using AdsunVietKey.Core;
+using AdsunVietKey.Core.Conversion;
+using AdsunVietKey.Core.Engine;
+using AdsunVietKey.Core.Macros;
+using AdsunVietKey.Input;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Ứng dụng chạy ở khay hệ thống: icon V/E, menu chuột phải giống UniKey, bấm trái để chuyển Việt/Anh.</summary>
 internal sealed class TrayApp : ApplicationContext
@@ -138,7 +138,7 @@ internal sealed class TrayApp : ApplicationContext
         if (_settings.BeepOnToggle)
             SystemSounds.Beep.Play();
         if (_settings.ShowFeedback)
-            _tray.ShowBalloonTip(1000, "VietKey", StatusText(), ToolTipIcon.None);
+            _tray.ShowBalloonTip(1000, "AdsunVietKey", StatusText(), ToolTipIcon.None);
     }
 
     private void OnHotkey(AppHotkey key)
@@ -209,13 +209,13 @@ internal sealed class TrayApp : ApplicationContext
         {
             int? length = ClipboardConverter.ConvertClipboard(_settings.ConvertFrom, _settings.ConvertTo);
             if (length is null)
-                _tray.ShowBalloonTip(2000, "VietKey", Lang.T("Clipboard không có văn bản để chuyển mã.", "Clipboard has no text to convert."), ToolTipIcon.Warning);
+                _tray.ShowBalloonTip(2000, "AdsunVietKey", Lang.T("Clipboard không có văn bản để chuyển mã.", "Clipboard has no text to convert."), ToolTipIcon.Warning);
             else
-                _tray.ShowBalloonTip(2000, "VietKey", Lang.T($"Đã chuyển clipboard: {from} → {to}", $"Clipboard converted: {from} → {to}"), ToolTipIcon.Info);
+                _tray.ShowBalloonTip(2000, "AdsunVietKey", Lang.T($"Đã chuyển clipboard: {from} → {to}", $"Clipboard converted: {from} → {to}"), ToolTipIcon.Info);
         }
         catch (Exception ex)
         {
-            _tray.ShowBalloonTip(3000, "VietKey", Lang.T("Lỗi chuyển mã clipboard: ", "Clipboard conversion failed: ") + ex.Message, ToolTipIcon.Error);
+            _tray.ShowBalloonTip(3000, "AdsunVietKey", Lang.T("Lỗi chuyển mã clipboard: ", "Clipboard conversion failed: ") + ex.Message, ToolTipIcon.Error);
         }
     }
 
@@ -260,7 +260,7 @@ internal sealed class TrayApp : ApplicationContext
         // dựng lại menu sau khi sự kiện Click hiện tại (nếu có) xử lý xong
         _invoker.BeginInvoke(new Action(BuildMenu));
         _tray.Icon = _settings.Enabled ? _iconVi : _iconEn;
-        string text = "VietKey – " + StatusText();
+        string text = "AdsunVietKey – " + StatusText();
         _tray.Text = text.Length > 63 ? text[..63] : text;
 
         _panel?.RefreshValues();

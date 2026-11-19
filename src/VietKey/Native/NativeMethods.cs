@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VietKey.Native;
+namespace AdsunVietKey.Native;
 
 internal static class NativeMethods
 {

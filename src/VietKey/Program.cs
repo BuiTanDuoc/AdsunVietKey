@@ -1,6 +1,6 @@
-using VietKey.App;
+using AdsunVietKey.App;
 
-namespace VietKey;
+namespace AdsunVietKey;
 
 internal static class Program
 {
@@ -10,10 +10,10 @@ internal static class Program
         ApplicationConfiguration.Initialize();
         UiKit.Initialize();
 
-        using var mutex = new Mutex(initiallyOwned: true, @"Local\VietKey.SingleInstance", out bool isFirst);
+        using var mutex = new Mutex(initiallyOwned: true, @"Local\AdsunVietKey.SingleInstance", out bool isFirst);
         if (!isFirst)
         {
-            UiKit.Info("VietKey đang chạy (xem icon ở khay hệ thống).");
+            UiKit.Info("AdsunVietKey đang chạy (xem icon ở khay hệ thống).");
             return;
         }
 

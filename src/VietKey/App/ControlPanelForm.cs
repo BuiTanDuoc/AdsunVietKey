@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Sunny.UI;
-using VietKey.Core.Conversion;
-using VietKey.Core.Engine;
+using AdsunVietKey.Core.Conversion;
+using AdsunVietKey.Core.Engine;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>
 /// Bảng điều khiển (SunnyUI) theo bố cục UniKey: phần "Điều khiển" luôn hiện,
@@ -218,7 +218,7 @@ internal sealed class ControlPanelForm : UIForm
     /// <summary>Gán chữ theo ngôn ngữ giao diện (gọi lại khi đổi "Vietnamese interface").</summary>
     public void ApplyTexts()
     {
-        Text = $"VietKey {Application.ProductVersion.Split('+')[0]}";
+        Text = $"AdsunVietKey {Application.ProductVersion.Split('+')[0]}";
         _gbControl.Text = Lang.T("Điều khiển", "Control");
         _lblCharset.Text = Lang.T("Bảng mã:", "Charset:");
         _lblMethod.Text = Lang.T("Kiểu gõ:", "Input method:");
@@ -443,15 +443,15 @@ internal sealed class ControlPanelForm : UIForm
             "  Ctrl+Shift+F9            Quick clipboard conversion\r\n\r\n" +
             "Left-click the V/E tray icon to switch Vietnamese/English.\r\n" +
             "Theme and color: Control panel → More → Appearance.");
-        new TextViewForm(Lang.T("VietKey – Hướng dẫn", "VietKey – Help"), text).Show();
+        new TextViewForm(Lang.T("AdsunVietKey – Hướng dẫn", "AdsunVietKey – Help"), text).Show();
     }
 
     public static void ShowAbout()
     {
         string version = Application.ProductVersion.Split('+')[0];
         UiKit.Info(
-            Lang.T($"VietKey {version}\nBộ gõ tiếng Việt Telex/VNI viết bằng C# .NET 8 WinForms, giao diện SunnyUI.\nBố cục theo UniKey.",
-                   $"VietKey {version}\nVietnamese Telex/VNI input method in C# .NET 8 WinForms with SunnyUI.\nLayout modelled on UniKey."),
+            Lang.T($"AdsunVietKey {version}\nBộ gõ tiếng Việt Telex/VNI viết bằng C# .NET 8 WinForms, giao diện SunnyUI.\nBố cục theo UniKey.",
+                   $"AdsunVietKey {version}\nVietnamese Telex/VNI input method in C# .NET 8 WinForms with SunnyUI.\nLayout modelled on UniKey."),
             Lang.T("Thông tin", "About"));
     }
 }

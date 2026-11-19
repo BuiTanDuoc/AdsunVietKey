@@ -1,9 +1,9 @@
-using VietKey.Core.Conversion;
-using VietKey.Core.Engine;
-using VietKey.Core.Macros;
+using AdsunVietKey.Core.Conversion;
+using AdsunVietKey.Core.Engine;
+using AdsunVietKey.Core.Macros;
 using Xunit;
 
-namespace VietKey.Core.Tests;
+namespace AdsunVietKey.Core.Tests;
 
 public class OptionsAndMacroTests
 {

@@ -1,7 +1,7 @@
-using VietKey.Core.Conversion;
-using VietKey.Core.Engine;
+using AdsunVietKey.Core.Conversion;
+using AdsunVietKey.Core.Engine;
 
-namespace VietKey.Core;
+namespace AdsunVietKey.Core;
 
 /// <summary>Kết quả xử lý một phím.</summary>
 /// <param name="Swallow">true: chặn phím gốc và gửi <see cref="Backspaces"/> + <see cref="Text"/> thay thế.</param>

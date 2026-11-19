@@ -1,7 +1,7 @@
 ﻿; ============================================================================
-;  VietKey – bộ cài đặt (Inno Setup 6.5+)
+;  AdsunVietKey – bộ cài đặt (Inno Setup 6.5+)
 ;  Build:  .\build-installer.ps1        (khuyên dùng – tự publish rồi đóng gói)
-;     hoặc ISCC.exe installer\VietKey.iss /DAppVersion=0.3.0 /DPublishDir=..\artifacts\publish\win-x64
+;     hoặc ISCC.exe installer\AdsunVietKey.iss /DAppVersion=0.3.0 /DPublishDir=..\artifacts\publish\win-x64
 ; ============================================================================
 
 #ifndef AppVersion
@@ -17,9 +17,9 @@
   #define Arch "x64"
 #endif
 
-#define AppName      "VietKey"
-#define AppExe       "VietKey.exe"
-#define AppPublisher "VietKey"
+#define AppName      "AdsunVietKey"
+#define AppExe       "AdsunVietKey.exe"
+#define AppPublisher "AdsunVietKey"
 #define AppId        "{{6F1B7A52-3C9E-4E7B-9C1D-5A2B8E0F4D17}"
 
 [Setup]
@@ -32,7 +32,7 @@ AppComments=Bộ gõ tiếng Việt Telex/VNI
 VersionInfoVersion={#AppVersion}
 VersionInfoDescription={#AppName} Setup
 
-; Mặc định cài cho người dùng hiện tại (không cần quyền admin, giống cấu hình HKCU của VietKey);
+; Mặc định cài cho người dùng hiện tại (không cần quyền admin, giống cấu hình HKCU của AdsunVietKey);
 ; người dùng có thể chọn "cài cho mọi người" ở hộp thoại đầu tiên.
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
@@ -51,7 +51,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 
 OutputDir={#OutputDir}
-OutputBaseFilename=VietKey-Setup-{#AppVersion}-win-{#Arch}
+OutputBaseFilename=AdsunVietKey-Setup-{#AppVersion}-win-{#Arch}
 SetupIconFile=..\src\VietKey\VietKey.ico
 UninstallDisplayIcon={app}\{#AppExe}
 UninstallDisplayName={#AppName} {#AppVersion}
@@ -67,18 +67,18 @@ Name: "vi"; MessagesFile: "Vietnamese.isl"
 Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-vi.TaskStartup=Khởi động VietKey cùng Windows
+vi.TaskStartup=Khởi động AdsunVietKey cùng Windows
 vi.TaskDesktop=Tạo biểu tượng trên màn hình Desktop
 vi.GroupOptions=Tuỳ chọn:
-vi.LaunchApp=Chạy VietKey ngay
-vi.RemoveSettings=Xoá cả cấu hình và bảng gõ tắt của VietKey?%n%n(Chọn "No" để giữ lại cho lần cài sau.)
-vi.NeedRuntime=VietKey cần .NET 8 Desktop Runtime (x64).%n%nMở trang tải về ngay bây giờ?
-en.TaskStartup=Start VietKey with Windows
+vi.LaunchApp=Chạy AdsunVietKey ngay
+vi.RemoveSettings=Xoá cả cấu hình và bảng gõ tắt của AdsunVietKey?%n%n(Chọn "No" để giữ lại cho lần cài sau.)
+vi.NeedRuntime=AdsunVietKey cần .NET 8 Desktop Runtime (x64).%n%nMở trang tải về ngay bây giờ?
+en.TaskStartup=Start AdsunVietKey with Windows
 en.TaskDesktop=Create a desktop shortcut
 en.GroupOptions=Options:
-en.LaunchApp=Launch VietKey now
-en.RemoveSettings=Also remove VietKey settings and macro table?%n%n(Choose "No" to keep them for a future install.)
-en.NeedRuntime=VietKey requires the .NET 8 Desktop Runtime (x64).%n%nOpen the download page now?
+en.LaunchApp=Launch AdsunVietKey now
+en.RemoveSettings=Also remove AdsunVietKey settings and macro table?%n%n(Choose "No" to keep them for a future install.)
+en.NeedRuntime=AdsunVietKey requires the .NET 8 Desktop Runtime (x64).%n%nOpen the download page now?
 
 [Tasks]
 Name: "startup"; Description: "{cm:TaskStartup}"; GroupDescription: "{cm:GroupOptions}"
@@ -94,8 +94,8 @@ Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Registry]
-; Cùng khoá mà VietKey dùng cho tuỳ chọn "Khởi động cùng Windows" (luôn theo người dùng hiện tại)
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "VietKey"; \
+; Cùng khoá mà AdsunVietKey dùng cho tuỳ chọn "Khởi động cùng Windows" (luôn theo người dùng hiện tại)
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "AdsunVietKey"; \
     ValueData: """{app}\{#AppExe}"""; Tasks: startup; Flags: uninsdeletevalue
 
 [Run]
@@ -105,7 +105,7 @@ Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchApp}"; Flags: nowait postin
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM {#AppExe}"; Flags: runhidden; RunOnceId: "KillVietKey"
 
 [Code]
-{ Đóng VietKey đang chạy (bộ gõ chạy nền ở khay hệ thống nên Restart Manager có thể không đóng được) }
+{ Đóng AdsunVietKey đang chạy (bộ gõ chạy nền ở khay hệ thống nên Restart Manager có thể không đóng được) }
 procedure KillVietKey();
 var
   ResultCode: Integer;
@@ -165,8 +165,8 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if CurUninstallStep = usUninstall then
-    { VietKey có thể tự bật "Khởi động cùng Windows" sau khi cài → luôn xoá khi gỡ }
-    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'VietKey');
+    { AdsunVietKey có thể tự bật "Khởi động cùng Windows" sau khi cài → luôn xoá khi gỡ }
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'AdsunVietKey');
 
   if CurUninstallStep = usPostUninstall then
   begin
@@ -174,8 +174,8 @@ begin
       Exit;
     if MsgBox(CustomMessage('RemoveSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
     begin
-      RegDeleteKeyIncludingSubkeys(HKCU, 'Software\VietKey');
-      DelTree(ExpandConstant('{userappdata}\VietKey'), True, True, True);
+      RegDeleteKeyIncludingSubkeys(HKCU, 'Software\AdsunVietKey');
+      DelTree(ExpandConstant('{userappdata}\AdsunVietKey'), True, True, True);
     end;
   end;
 end;

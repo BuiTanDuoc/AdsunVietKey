@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace VietKey.Core.Macros;
+namespace AdsunVietKey.Core.Macros;
 
 /// <summary>
 /// Bảng gõ tắt: "vn" → "Việt Nam". Tra không phân biệt hoa/thường;
@@ -64,7 +64,7 @@ public sealed class MacroTable
 
     public void Save(TextWriter writer)
     {
-        writer.WriteLine("# VietKey – bảng gõ tắt: từ_tắt<TAB>nội_dung");
+        writer.WriteLine("# AdsunVietKey – bảng gõ tắt: từ_tắt<TAB>nội_dung");
         foreach (var (key, value) in Entries)
             writer.WriteLine($"{key}\t{value}");
     }

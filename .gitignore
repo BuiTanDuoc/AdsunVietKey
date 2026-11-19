@@ -57,3 +57,4 @@ TestResult.xml
 nunit-*.xml
 .vs/
 src/VietKey/VietKey.csproj.user
+src/VietKey/AdsunVietKey.csproj.user

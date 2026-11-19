@@ -1,13 +1,12 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.12.12412.261 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VietKey.Core", "src\VietKey.Core\VietKey.Core.csproj", "{A118AC3E-BE21-44ED-9116-0A7844ABE2F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdsunVietKey.Core", "src\VietKey.Core\AdsunVietKey.Core.csproj", "{A118AC3E-BE21-44ED-9116-0A7844ABE2F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VietKey", "src\VietKey\VietKey.csproj", "{F175B492-B58D-43C1-83CD-1A11E646691B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdsunVietKey", "src\VietKey\AdsunVietKey.csproj", "{F175B492-B58D-43C1-83CD-1A11E646691B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VietKey.Core.Tests", "tests\VietKey.Core.Tests\VietKey.Core.Tests.csproj", "{DBEC247C-CA75-49CC-A5BF-3A075D110822}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdsunVietKey.Core.Tests", "tests\VietKey.Core.Tests\AdsunVietKey.Core.Tests.csproj", "{DBEC247C-CA75-49CC-A5BF-3A075D110822}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B865C730-1E93-4B91-86C7-B408D8AC04F8}"
 EndProject
@@ -32,9 +31,15 @@ Global
 		{DBEC247C-CA75-49CC-A5BF-3A075D110822}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBEC247C-CA75-49CC-A5BF-3A075D110822}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A118AC3E-BE21-44ED-9116-0A7844ABE2F6} = {B865C730-1E93-4B91-86C7-B408D8AC04F8}
 		{F175B492-B58D-43C1-83CD-1A11E646691B} = {B865C730-1E93-4B91-86C7-B408D8AC04F8}
 		{DBEC247C-CA75-49CC-A5BF-3A075D110822} = {CE635EAB-6A23-411F-A6CE-684346284299}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D912AA8-7C9A-440E-A113-7A81BE403732}
 	EndGlobalSection
 EndGlobal

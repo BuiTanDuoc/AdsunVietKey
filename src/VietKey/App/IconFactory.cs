@@ -1,8 +1,8 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
-using VietKey.Native;
+using AdsunVietKey.Native;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Vẽ icon khay hệ thống: "V" nền đỏ (tiếng Việt) hoặc "E" nền xanh (tiếng Anh).</summary>
 internal static class IconFactory

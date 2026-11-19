@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Text;
-using VietKey.Core.Conversion;
+using AdsunVietKey.Core.Conversion;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Chuyển mã nội dung clipboard và file văn bản.</summary>
 internal static class ClipboardConverter

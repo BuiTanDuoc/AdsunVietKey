@@ -1,7 +1,7 @@
 using Sunny.UI;
-using VietKey.Core.Conversion;
+using AdsunVietKey.Core.Conversion;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Công cụ chuyển mã (SunnyUI, tương tự UniKey Toolkit): clipboard, ô văn bản và file.</summary>
 internal sealed class ConverterForm : UIForm
@@ -27,7 +27,7 @@ internal sealed class ConverterForm : UIForm
         _settings = settings;
         _k = UiKit.Scale(this);
 
-        Text = Lang.T("VietKey – Công cụ chuyển mã", "VietKey – Converter toolkit");
+        Text = Lang.T("AdsunVietKey – Công cụ chuyển mã", "AdsunVietKey – Converter toolkit");
         StartPosition = FormStartPosition.CenterScreen;
         ShowTitleIcon = icon is not null;
         if (icon is not null) Icon = icon;

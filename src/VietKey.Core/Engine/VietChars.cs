@@ -1,4 +1,4 @@
-namespace VietKey.Core.Engine;
+namespace AdsunVietKey.Core.Engine;
 
 /// <summary>Bảng nguyên âm tiếng Việt dựng sẵn (precomposed Unicode).</summary>
 internal static class VietChars

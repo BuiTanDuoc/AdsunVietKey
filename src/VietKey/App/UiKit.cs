@@ -1,8 +1,8 @@
 using Sunny.UI;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
-/// <summary>Theme SunnyUI, font chung và các hộp thoại dùng trong VietKey.</summary>
+/// <summary>Theme SunnyUI, font chung và các hộp thoại dùng trong AdsunVietKey.</summary>
 internal static class UiKit
 {
     /// <summary>Các theme cho người dùng chọn (Colorful = tự chọn màu chủ đạo).</summary>
@@ -86,8 +86,8 @@ internal static class UiKit
     // ------------------------------------------------------------------ hộp thoại
 
     public static void Info(string message, string? title = null) =>
-        UIMessageBox.Show(message, title ?? "VietKey", CurrentStyle, UIMessageBoxButtons.OK);
+        UIMessageBox.Show(message, title ?? "AdsunVietKey", CurrentStyle, UIMessageBoxButtons.OK);
 
     public static void Error(string message, string? title = null) =>
-        UIMessageBox.Show(message, title ?? "VietKey", UIStyle.Red, UIMessageBoxButtons.OK);
+        UIMessageBox.Show(message, title ?? "AdsunVietKey", UIStyle.Red, UIMessageBoxButtons.OK);
 }

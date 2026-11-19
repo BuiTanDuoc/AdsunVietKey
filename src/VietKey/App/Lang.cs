@@ -1,4 +1,4 @@
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Chọn chuỗi giao diện tiếng Việt hoặc tiếng Anh ("Vietnamese interface").</summary>
 internal static class Lang

@@ -1,7 +1,7 @@
 using System.Text;
-using static VietKey.Core.Engine.VietChars;
+using static AdsunVietKey.Core.Engine.VietChars;
 
-namespace VietKey.Core.Engine;
+namespace AdsunVietKey.Core.Engine;
 
 public enum InputMethod
 {

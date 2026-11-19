@@ -1,7 +1,7 @@
 using System.Text;
-using VietKey.Core.Engine;
+using AdsunVietKey.Core.Engine;
 
-namespace VietKey.Core.Conversion;
+namespace AdsunVietKey.Core.Conversion;
 
 public enum VietCharset
 {

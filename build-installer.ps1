@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-    Build bộ cài đặt VietKey: chạy test → dotnet publish → đóng gói bằng Inno Setup.
+    Build bộ cài đặt AdsunVietKey: chạy test → dotnet publish → đóng gói bằng Inno Setup.
 
 .EXAMPLE
     .\build-installer.ps1                       # x64, tự chứa .NET (không cần cài runtime)
@@ -17,7 +17,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
-$project = Join-Path $root 'src\VietKey\VietKey.csproj'
+$project = Join-Path $root 'src\VietKey\AdsunVietKey.csproj'
 $artifacts = Join-Path $root 'artifacts'
 $publishDir = Join-Path $artifacts "publish\win-$Arch"
 
@@ -28,7 +28,7 @@ if (-not $Version) {
     $Version = ([xml](Get-Content $project -Raw)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
     if (-not $Version) { $Version = '0.1.0' }
 }
-Write-Host "VietKey $Version (win-$Arch, $(if ($FrameworkDependent) { 'framework-dependent' } else { 'self-contained' }))"
+Write-Host "AdsunVietKey $Version (win-$Arch, $(if ($FrameworkDependent) { 'framework-dependent' } else { 'self-contained' }))"
 
 # ---- tìm Inno Setup trước để báo lỗi sớm
 $iscc = (Get-Command iscc.exe -ErrorAction SilentlyContinue).Source
@@ -76,7 +76,7 @@ if ($LASTEXITCODE) { throw 'dotnet publish thất bại.' }
 # ---- đóng gói
 Step "Inno Setup ($iscc)"
 $isccArgs = @(
-    (Join-Path $root 'installer\VietKey.iss'),
+    (Join-Path $root 'installer\AdsunVietKey.iss'),
     "/DAppVersion=$Version",
     "/DPublishDir=$publishDir",
     "/DOutputDir=$artifacts",
@@ -86,5 +86,5 @@ if ($FrameworkDependent) { $isccArgs += '/DFrameworkDependent=1' }
 & $iscc @isccArgs
 if ($LASTEXITCODE) { throw 'Inno Setup thất bại.' }
 
-$setup = Join-Path $artifacts "VietKey-Setup-$Version-win-$Arch.exe"
+$setup = Join-Path $artifacts "AdsunVietKey-Setup-$Version-win-$Arch.exe"
 Step "Xong: $setup"

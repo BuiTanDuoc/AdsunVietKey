@@ -1,7 +1,7 @@
-using VietKey.Core.Conversion;
+using AdsunVietKey.Core.Conversion;
 using Xunit;
 
-namespace VietKey.Core.Tests;
+namespace AdsunVietKey.Core.Tests;
 
 public class ConverterTests
 {

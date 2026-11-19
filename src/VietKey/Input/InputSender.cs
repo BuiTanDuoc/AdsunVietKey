@@ -1,12 +1,12 @@
 using System.Runtime.InteropServices;
-using static VietKey.Native.NativeMethods;
+using static AdsunVietKey.Native.NativeMethods;
 
-namespace VietKey.Input;
+namespace AdsunVietKey.Input;
 
 /// <summary>Gửi phím Backspace và ký tự vào ứng dụng đang được gõ.</summary>
 internal static class InputSender
 {
-    /// <summary>Đánh dấu các sự kiện do VietKey tự gửi để hook bỏ qua chúng ("VIET").</summary>
+    /// <summary>Đánh dấu các sự kiện do AdsunVietKey tự gửi để hook bỏ qua chúng ("VIET").</summary>
     public static readonly IntPtr Marker = new(0x56494554);
 
     private const ushort VK_V = 0x56;

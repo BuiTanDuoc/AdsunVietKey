@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\VietKey.Core\VietKey.Core.csproj" />
+    <ProjectReference Include="..\..\src\VietKey.Core\AdsunVietKey.Core.csproj" />
   </ItemGroup>
 
 </Project>

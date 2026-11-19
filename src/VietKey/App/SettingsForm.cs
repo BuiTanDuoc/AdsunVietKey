@@ -1,6 +1,6 @@
-using VietKey.Core.Engine;
+using AdsunVietKey.Core.Engine;
 
-namespace VietKey.App;
+namespace AdsunVietKey.App;
 
 /// <summary>Bảng điều khiển (dựng bằng code, không cần Designer).</summary>
 internal sealed class SettingsForm : Form
@@ -17,7 +17,7 @@ internal sealed class SettingsForm : Form
     {
         _settings = settings;
 
-        Text = "VietKey – Bảng điều khiển";
+        Text = "AdsunVietKey – Bảng điều khiển";
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
