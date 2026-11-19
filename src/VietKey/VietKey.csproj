@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>VietKey</RootNamespace>
+    <AssemblyName>VietKey</AssemblyName>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <Version>0.1.0</Version>
+    <Product>VietKey</Product>
+    <Description>Bộ gõ tiếng Việt Telex/VNI viết bằng C# WinForms</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VietKey.Core\VietKey.Core.csproj" />
+  </ItemGroup>
+
+</Project>
