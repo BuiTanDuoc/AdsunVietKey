@@ -7,7 +7,9 @@ Bộ gõ tiếng Việt cho Windows viết bằng **C# / .NET 8 / WinForms**, gi
 - thay chữ bằng `SendInput` (Backspace + ký tự Unicode `KEYEVENTF_UNICODE`);
 - icon ở khay hệ thống, lưu cấu hình vào `HKCU\Software\VietKey`.
 
-[image][https://github.com/BuiTanDuoc/AdsunVietKey/blob/Master/images/main_panel.jpg]
+<p align="center">
+  <a href="https://github.com/BuiTanDuoc/AdsunVietKey"><img src="https://github.com/BuiTanDuoc/AdsunVietKey/blob/Master/images/main_panel.jpg" alt="Adsun Vietkey"></a>
+</p>
 
 ## Giấy phép
 
