@@ -7,6 +7,8 @@ Bộ gõ tiếng Việt cho Windows viết bằng **C# / .NET 8 / WinForms**, gi
 - thay chữ bằng `SendInput` (Backspace + ký tự Unicode `KEYEVENTF_UNICODE`);
 - icon ở khay hệ thống, lưu cấu hình vào `HKCU\Software\VietKey`.
 
+[image][https://github.com/BuiTanDuoc/AdsunVietKey/blob/Master/images/main_panel.jpg]
+
 ## Giấy phép
 
 SunnyUI phát hành theo **GPL-3.0**. Nếu phân phối VietKey kèm SunnyUI, VietKey cũng phải phát hành theo giấy phép tương thích GPL-3.0 (công bố mã nguồn). Dùng nội bộ thì không bị ràng buộc này.
